@@ -1132,6 +1132,9 @@
             }
           }
         },
+        "lints": {
+          "$ref": "https://raw.githubusercontent.com/nekowinston/cargo-toml-lints/main/cargo-lints.schema.json"
+        },
         "resolver": {
           "$ref": "#/definitions/Resolver"
         },
