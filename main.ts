@@ -1,7 +1,9 @@
-#!/usr/bin/env -S deno run --allow-write=lints.json
+#!/usr/bin/env -S deno run --allow-write=cargo-lints.schema.json
 import clippyLints from "https://rust-lang.github.io/rust-clippy/master/lints.json" with {
   type: "json",
 };
+
+import { allLints } from "./rustclints.ts";
 
 const lintLevels = ["allow", "warn", "deny", "forbid"];
 
@@ -44,6 +46,16 @@ const lints = {
     },
   },
   properties: {
+    rust: {
+      title: "Rust Lints",
+      type: "object",
+      properties: allLints.reduce((acc, cur) => {
+        acc[cur] = {
+          $ref: "#/definitions/LintLevel",
+        };
+        return acc;
+      }, {} as Record<string, unknown>),
+    },
     clippy: {
       title: "Clippy Lints",
       type: "object",
