@@ -1133,7 +1133,7 @@
           }
         },
         "lints": {
-          "$ref": "https://raw.githubusercontent.com/nekowinston/cargo-toml-lints/main/cargo-lints.schema.json"
+          "$ref": "https://raw.githubusercontent.com/nekowinston/cargo-toml-lints/main/partial-cargo-lints.schema.json"
         },
         "resolver": {
           "$ref": "#/definitions/Resolver"
@@ -1777,7 +1777,7 @@
       }
     },
     "lints": {
-      "$ref": "https://raw.githubusercontent.com/nekowinston/cargo-toml-lints/main/cargo-lints.schema.json"
+      "$ref": "https://raw.githubusercontent.com/nekowinston/cargo-toml-lints/main/partial-cargo-lints.schema.json"
     },
     "package": {
       "$ref": "#/definitions/Package"

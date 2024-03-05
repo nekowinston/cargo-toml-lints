@@ -1,11 +1,9 @@
-#!/usr/bin/env -S deno run --allow-write=cargo-lints.schema.json
+#!/usr/bin/env -S deno run --allow-write=partial-cargo-lints.schema.json
 import clippyLints from "https://rust-lang.github.io/rust-clippy/master/lints.json" with {
   type: "json",
 };
 
-import { allLints } from "./rustclints.ts";
-
-const lintLevels = ["allow", "warn", "deny", "forbid"];
+import { allLints, lintLevelDocs, lintLevels } from "./rustclints.ts";
 
 const lintGroups: string[] = [];
 Object.values(clippyLints).forEach((lint) => {
@@ -16,20 +14,27 @@ Object.values(clippyLints).forEach((lint) => {
 lintGroups.sort();
 
 const lints = {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://json.schemastore.org/cargo-lints.json",
+  $schema: "http://json-schema.org/draft-07/schema#",
+  $id: "https://json.schemastore.org/cargo-lints.json",
   title: "Cargo.toml",
   type: "object",
   definitions: {
     "LintLevel": {
       title: "Lint Level",
+      additionalProperties: false,
       anyOf: [
         {
           type: "string",
           enum: lintLevels,
+          "x-taplo": {
+            docs: {
+              enumValues: lintLevelDocs,
+            },
+          },
         },
         {
           type: "object",
+          additionalProperties: false,
           properties: {
             level: {
               type: "string",
@@ -40,7 +45,6 @@ const lints = {
             },
           },
           required: ["level"],
-          additionalProperties: false,
         },
       ],
     },
@@ -49,8 +53,9 @@ const lints = {
     rust: {
       title: "Rust Lints",
       type: "object",
-      properties: allLints.reduce((acc, cur) => {
-        acc[cur] = {
+      properties: allLints.reduce((acc, level) => {
+        acc ??= {};
+        acc[level] = {
           $ref: "#/definitions/LintLevel",
         };
         return acc;
@@ -59,18 +64,35 @@ const lints = {
     clippy: {
       title: "Clippy Lints",
       type: "object",
-      properties: Object.values(clippyLints).map((lint) => ({
-        [lint.id]: {
-          description: lint.docs,
-          $ref: "#/definitions/LintLevel",
-          "x-taplo": {
-            "links": {
-              "key":
-                `https://rust-lang.github.io/rust-clippy/master/index.html#/${lint.id}`,
+      properties: {
+        ...Object.values(clippyLints).reduce((acc, lint) => {
+          acc ??= {};
+          acc[lint.id] = {
+            $ref: "#/definitions/LintLevel",
+            description: lint.docs,
+            "x-taplo": {
+              links: {
+                key:
+                  `https://rust-lang.github.io/rust-clippy/master/index.html#/${lint.id}`,
+              },
             },
-          },
-        },
-      })).reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+          };
+          return acc;
+        }, {} as Record<string, unknown>),
+        ...lintGroups.reduce((acc, group) => {
+          acc ??= {};
+          acc[group] = {
+            $ref: "#/definitions/LintLevel",
+            "x-taplo": {
+              links: {
+                key:
+                  `https://rust-lang.github.io/rust-clippy/master/index.html#?groups=${group}`,
+              },
+            },
+          };
+          return acc;
+        }, {} as Record<string, unknown>),
+      },
     },
   },
   "x-taplo-info": {
@@ -79,6 +101,6 @@ const lints = {
 };
 
 Deno.writeTextFileSync(
-  "cargo-lints.schema.json",
+  "partial-cargo-lints.schema.json",
   JSON.stringify(lints, null, 2),
 );
