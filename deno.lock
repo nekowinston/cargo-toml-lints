@@ -1,0 +1,6 @@
+{
+  "version": "3",
+  "remote": {
+    "https://rust-lang.github.io/rust-clippy/master/lints.json": "55f70021e5f3ca109f6e5568fa63d3fc061d1c20f0246110bd297f1c7ed15793"
+  }
+}
