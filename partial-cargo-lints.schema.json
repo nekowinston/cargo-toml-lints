@@ -1,7 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://json.schemastore.org/cargo-lints.json",
-  "title": "Cargo.toml",
+  "title": "Cargo Manifest Lints",
+  "description": "#### The `lints` section\n\nOverride the default level of lints from different tools by assigning them to a new level in a\ntable, for example:\n```toml\n[lints.rust]\nunsafe_code = \"forbid\"\n```\n\nThis is short-hand for:\n```toml\n[lints.rust]\nunsafe_code = { level = \"forbid\", priority = 0 }\n```\n\n`level` corresponds to the [lint levels](https://doc.rust-lang.org/rustc/lints/levels.html) in `rustc`:\n- `forbid`\n- `deny`\n- `warn`\n- `allow`\n\n`priority` is a signed integer that controls which lints or lint groups override other lint groups:\n- lower (particularly negative) numbers have lower priority, being overridden\n  by higher numbers, and show up first on the command-line to tools like\n  `rustc`\n\nTo know which table under `[lints]` a particular lint belongs under, it is the part before `::` in the lint\nname.  If there isn't a `::`, then the tool is `rust`.  For example a warning\nabout `unsafe_code` would be `lints.rust.unsafe_code` but a lint about\n`clippy::enum_glob_use` would be `lints.clippy.enum_glob_use`.\n\nFor example:\n```toml\n[lints.rust]\nunsafe_code = \"forbid\"\n\n[lints.clippy]\nenum_glob_use = \"deny\"\n```\n\nGenerally, these will only affect local development of the current package.\nCargo only applies these to the current package and not to dependencies.\nAs for dependents, Cargo suppresses lints from non-path dependencies with features like\n[`--cap-lints`](../../rustc/lints/levels.html#capping-lints).",
   "type": "object",
   "definitions": {
     "LintLevel": {
@@ -9,7 +10,6 @@
       "additionalProperties": false,
       "anyOf": [
         {
-          "type": "string",
           "enum": [
             "allow",
             "warn",
@@ -7301,6 +7301,9 @@
     }
   },
   "x-taplo-info": {
+    "links": {
+      "key": "https://doc.rust-lang.org/cargo/reference/manifest.html#the-lints-section"
+    },
     "authors": [
       "nekowinston (https://github.com/nekowinston)"
     ]
